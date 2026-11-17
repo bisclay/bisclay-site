@@ -8,6 +8,8 @@ status: dostupno
 naslovnica: /uploads/oreskovic16-1.jpg
 galerija:
   - /uploads/oreskovic19.jpg
+  - /uploads/oreskovic20-1.jpg
+  - /uploads/oreskovic12.jpg
 istaknuto: true
 redoslijed: 0
 ---
