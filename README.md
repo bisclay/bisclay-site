@@ -135,3 +135,6 @@ Nikad ih ne briši; oni su dokaz rada, ne ostatak.
   pokvariti** krivom putanjom. Zato povremeno `npm run optimize`.
 - Ako build padne, provjeri Actions log — najčešće je uzrok polje koje nedostaje
   (npr. `naslovnica`) ili `status` koji nije `dostupno` / `rezervirano` / `prodano`.
+- **Za agente / developere:** stanje sustava, invarijante, verifikacijske naredbe i
+  runbook za slučaj da GitHub ugasi stranicu — [`notes/2026-11-17-state-and-runbook.md`](notes/2026-11-17-state-and-runbook.md)
+  (na engleskom).
