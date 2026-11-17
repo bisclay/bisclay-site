@@ -58,7 +58,10 @@ npm run optimize # smanji fotografije u public/uploads/ na WebP
 3. **GitHub → repo → Settings → Pages → Source: GitHub Actions.**
    Workflow `.github/workflows/deploy.yml` se sam pokrene na svaki push.
 
-4. **DNS za bisclay.com** (kod registrara):
+4. **DNS za bisclay.com** (kod registrara) — detalji, objašnjenja i gotov zone file:
+   [`dns/README.md`](dns/README.md) i [`dns/bisclay.com.zone`](dns/bisclay.com.zone)
+
+   Ukratko (apex `@` + `www`):
 
    | Tip | Ime | Vrijednost |
    |-----|-----|-----------|
@@ -66,11 +69,11 @@ npm run optimize # smanji fotografije u public/uploads/ na WebP
    | A | `@` | `185.199.109.153` |
    | A | `@` | `185.199.110.153` |
    | A | `@` | `185.199.111.153` |
-   | AAAA | `@` | `2606:50c0:8000::153` |
-   | AAAA | `@` | `2606:50c0:8001::153` |
-   | AAAA | `@` | `2606:50c0:8002::153` |
-   | AAAA | `@` | `2606:50c0:8003::153` |
-   | CNAME | `www` | `<org>.github.io` |
+   | CNAME | `www` | `bisclay.github.io` |
+
+   AAAA (IPv6) zapisi nisu potrebni — zakomentirani su u zone fileu.
+   **CNAME na apexu nije dozvoljen** (RFC 2181); zato 4 A zapisa, a ne 1 CNAME.
+   Objašnjenje i alternativa (Cloudflare + jedan zapis) su u `dns/README.md`.
 
    Zatim u Pages postavkama upiši `bisclay.com` i uključi **Enforce HTTPS**.
    `public/CNAME` već sadrži domenu, pa je GitHub neće izgubiti pri svakom deployu.

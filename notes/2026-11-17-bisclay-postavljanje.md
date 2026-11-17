@@ -43,10 +43,25 @@ i CSS filter (grayscale + opacity). Sada svi radovi stoje u istoj galeriji, sort
 tako da dostupni idu prvi, a prodani nose samo značku **Prodano** i prigušen naslov.
 Razlog: stranica je portfolio, prodani komad je dokaz rada, a ne ostatak.
 
+## Deploy (stanje 2026-11-17)
+
+- Repo: `bisclay/bisclay-site`, **public**, branch `main`
+- AstroPaper template (jedini commit `ef209fc`) zamijenjen force-pushom commitom `cbd9ab7`
+  - stari commit ostaje dostupan po SHA ako ikad zatreba
+  - `_studio.yml` (Astro Studio) i blog shema u `.pages.yml` su nestali s njim
+- Pages: uključen, `build_type=workflow`, `cname=bisclay.com`
+- Workflow run `44087913945`: build ✓ (18s), deploy ✓ (11s)
+- `https_enforced` još `false` — uključiti nakon što DNS proradi i cert se izda
+- DNS (Namecheap BasicDNS) **još nije promijenjen**: A zapis `162.255.119.154`
+  (parking) i `www` CNAME `parkingpage.namecheap.com` stoje dok se ne zamijene
+  GitHubovim A/AAAA zapisima. Do tada se stranica ne otvara (github.io URL
+  preusmjerava na bisclay.com nakon postavljanja custom domene).
+
 ## Otvoreno / sljedeće
 
-- [ ] Push u organizaciju, uključiti Pages (source: GitHub Actions)
-- [ ] DNS A/AAAA zapisi za apex + `www` CNAME
+- [x] Push u organizaciju, uključiti Pages (source: GitHub Actions)
+- [ ] DNS A/AAAA zapisi za apex + `www` CNAME (Namecheap → Advanced DNS)
+- [ ] Uključiti **Enforce HTTPS** nakon izdavanja certifikata
 - [ ] Pages CMS: GitHub App na **samo** `bisclay` repo, pozvati mamu mailom
 - [ ] Zamijeniti tekst na početnoj i "O meni" stvarnim tekstom
 - [ ] Odlučiti je li potreban engleski (trenutno samo hrvatski)

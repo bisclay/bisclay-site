@@ -1,0 +1,55 @@
+; ============================================================================
+; bisclay.com — BIND zone file za GitHub Pages
+; Varijanta A: apex preko A/AAAA zapisa (radi na Namecheapu, Cloudflareu,
+;              i svakom provideru koji ne podržava ALIAS/CNAME na vrhu)
+;
+; Koristi ovo ako DNS držiš na Namecheap BasicDNS.
+; Namecheap NEMA uvoz zone filea — ovo je referenca za ručni unos.
+; Cloudflare ima "Import DNS records" koji ovu datoteku prima direktno.
+;
+; Provjera: dig +short A bisclay.com  → mora vratiti 4 GitHub adrese
+; ============================================================================
+
+$ORIGIN bisclay.com.
+$TTL 3600
+
+; --- SOA / NS (Namecheap nameserveri — ne mijenjati ako DNS ostaje tamo) ----
+@       IN      SOA     dns1.registrar-servers.com. hostmaster.bisclay.com. (
+                        2026111701      ; serial
+                        3600            ; refresh
+                        1800            ; retry
+                        604800          ; expire
+                        3600 )          ; minimum TTL
+
+@       IN      NS      dns1.registrar-servers.com.
+@       IN      NS      dns2.registrar-servers.com.
+
+; --- apex: GitHub Pages front-end IP-ovi -----------------------------------
+; GitHub preporučuje ALIAS/ANAME ili A zapise. Namecheap ne podržava ALIAS,
+; a CNAME na vrhu domene je po RFC-u zabranjen, pa ostaju A zapisi.
+@       IN      A       185.199.108.153
+@       IN      A       185.199.109.153
+@       IN      A       185.199.110.153
+@       IN      A       185.199.111.153
+
+; --- apex IPv6 (opcionalno — zakomentirano namjerno) ------------------------
+; GitHub: "You can also create AAAA records for IPv6 support." Nije potrebno.
+; Ako želiš IPv6, samo odkomentiraj ova 4 retka.
+; @     IN      AAAA    2606:50c0:8000::153
+; @     IN      AAAA    2606:50c0:8001::153
+; @     IN      AAAA    2606:50c0:8002::153
+; @     IN      AAAA    2606:50c0:8003::153
+
+; --- www --------------------------------------------------------------------
+; Meta je korijen organizacije (bisclay.github.io), NE "bisclay/bisclay-site".
+www     IN      CNAME   bisclay.github.io.
+
+; --- opcionalno: GitHub traži verifikaciju domene ---------------------------
+; Ako se u Settings → Pages pojavi zahtjev za verifikaciju, GitHub prikaže
+; točnu vrijednost. Ne izmišljati je — samo prepisati ono što GitHub da.
+; _github-pages-challenge-bisclay  IN  TXT  "<vrijednost koju prikaže GitHub>"
+
+; --- što NE stavljati -------------------------------------------------------
+; - wildcard (*) zapise: rizik od preuzimanja poddomena
+; - parking A zapis 162.255.119.154 (Namecheap default) — mora se obrisati
+; - MX/TXT zapise za e-mail ako ih imaš: njih NE diraj, ne utječu na web
