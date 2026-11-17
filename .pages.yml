@@ -117,6 +117,81 @@ content:
           format: markdown
           media: false
 
+  - name: pocetna
+    label: Početna stranica
+    type: file
+    path: src/data/pocetna.json
+    format: json
+    fields:
+      - name: heroNadnaslov
+        label: Natpis iznad naslova
+        type: string
+        description: Sitni tekst iznad velikog naslova na vrhu.
+
+      - name: heroNaslov
+        label: Glavni naslov
+        type: string
+        required: true
+        description: Najveći tekst na stranici. Kratko — 5 do 8 riječi.
+
+      - name: heroTekst
+        label: Uvodni tekst
+        type: text
+        description: Dvije-tri rečenice ispod naslova.
+
+      - name: heroSlika
+        label: Velika slika na vrhu (nije obavezno)
+        type: image
+        options:
+          categories: [image]
+          rename: safe
+        description: >-
+          Ako je prazno, prikazuje se fotografija prvog istaknutog rada.
+          Postavi samo ako želiš nešto drugo (npr. radionica, ruke u glini).
+
+      - name: gumb1
+        label: Gumb 1 (vodi na galeriju)
+        type: string
+        description: Tekst na glavnom gumbu.
+
+      - name: gumb2
+        label: Gumb 2 (vodi na kontakt)
+        type: string
+
+      - name: izborNaslov
+        label: Naslov izbora radova
+        type: string
+        description: npr. "Iz radionice"
+
+      - name: izborVeza
+        label: Tekst poveznice na galeriju
+        type: string
+        description: npr. "Svi radovi"
+
+      - name: blok1Naslov
+        label: Prvi blok — naslov
+        type: string
+
+      - name: blok1Tekst
+        label: Prvi blok — tekst
+        type: text
+
+      - name: blok1Gumb
+        label: Prvi blok — gumb (vodi na O meni)
+        type: string
+
+      - name: blok2Naslov
+        label: Drugi blok — naslov
+        type: string
+
+      - name: blok2Tekst
+        label: Drugi blok — tekst
+        type: text
+
+      - name: blok2Gumb
+        label: Drugi blok — gumb (vodi na kontakt)
+        type: string
+
   - name: stranice
     label: Stranice
     type: collection

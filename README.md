@@ -17,7 +17,9 @@ src/
 ├─ content/
 │  ├─ radovi/          # jedan .md po keramičkom radu
 │  └─ stranice/        # o-meni.md, kontakt.md
-├─ data/site.json      # naziv, email, instagram — uređuje se u CMS-u
+├─ data/
+│  ├─ site.json        # naziv, email, instagram — uređuje se u CMS-u
+│  └─ pocetna.json     # tekstovi naslovnice — uređuje se u CMS-u
 ├─ pages/              # rute: /, /galerija/, /rad/<slug>/, /o-meni/, /kontakt/
 ├─ components/         # Header, Footer, PieceCard
 ├─ layouts/Base.astro  # <head>, meta, OG tagovi
@@ -79,6 +81,8 @@ npm run optimize # smanji fotografije u public/uploads/ na WebP
    - `app.pagescms.org` → prijava GitHubom → instaliraj GitHub App na organizaciju,
      **Only select repositories → bisclay** (ne "All repositories").
    - Otvori repozitorij; `.pages.yml` je već tu pa nema što konfigurirati.
+     U CMS-u su četiri stavke: **Radovi**, **Početna stranica**, **Stranice**
+     (O meni, Kontakt) i **Postavke stranice** (naziv, e-mail, cijene).
    - **Collaborators → Invite** → mamin email.
      → Mama **ne treba GitHub račun**, ne treba 2FA, i ne vidi ostale repozitorije.
      Može uređivati sadržaj i medije, ali ne `.pages.yml` ni popis suradnika.

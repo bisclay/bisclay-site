@@ -63,6 +63,19 @@ Razlog: stranica je portfolio, prodani komad je dokaz rada, a ne ostatak.
   Detalji i upozorenje o redirect petlji (ako se odabere `www` kao kanonska
   adresa): `dns/README.md`.
 
+**Naslovnica postala uredljiva.** Tekstovi s početne (`index.astro`) bili su hardkodirani,
+pa ih CMS nije vidio. Izdvojeni su u `src/data/pocetna.json` i u `.pages.yml` kao
+`type: file` pod imenom **Početna stranica** (14 polja: nadnaslov, naslov, uvodni tekst,
+ova velika slika, tekstovi gumba, naslov izbora radova, dva bloka na dnu).
+
+- `heroSlika` je opcionalna — ako je prazna, prikazuje se fotografija prvog
+  istaknutog rada, kao i prije.
+- Ciljevi gumba (galerija / kontakt / o meni) su **fiksni** — uredljiv je samo
+  natpis, da se ne može slomiti navigacija.
+- `Stranice` (O meni, Kontakt) su i prije bile uredljive; nedostajala je samo naslovnica.
+- Provjereno: skup polja u `.pages.yml` i ključeva u JSON-u se poklapa 1:1;
+  smoke test (promjena naslova → rebuild → `grep` u `dist/index.html`) prolazi.
+
 ## Otvoreno / sljedeće
 
 - [x] Push u organizaciju, uključiti Pages (source: GitHub Actions)

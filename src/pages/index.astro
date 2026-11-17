@@ -4,28 +4,28 @@ import Base from '../layouts/Base.astro';
 import PieceCard from '../components/PieceCard.astro';
 import { sortRadovi } from '../lib/radovi';
 import site from '../data/site.json';
+import pocetna from '../data/pocetna.json';
 
 const radovi = sortRadovi(await getCollection('radovi'));
 const istaknuti = radovi.filter((r) => r.data.istaknuto).slice(0, 3);
 const izbor = istaknuti.length > 0 ? istaknuti : radovi.slice(0, 3);
-const heroImage = izbor[0]?.data.naslovnica ?? radovi[0]?.data.naslovnica;
+
+// Hero slika: ako je postavljena u CMS-u, koristi nju; inače prvi istaknuti rad.
+const heroImage =
+  (pocetna.heroSlika && pocetna.heroSlika.trim()) || izbor[0]?.data.naslovnica;
+
 const dostupno = radovi.filter((r) => r.data.status === 'dostupno').length;
 ---
 
-<Base description={site.opis}>
+<Base description={site.opis} image={heroImage || undefined}>
   <section class="wrap hero">
     <div>
-      <p class="eyebrow">{site.uloga}</p>
-      <h1 class="hero__title">
-        Zemlja, voda, vatra — i malo strpljenja.
-      </h1>
-      <p class="hero__text">
-        Svaki komad je ručno oblikovan i pečen, jedan po jedan. Nema serije,
-        nema dva ista. Ono što vidite je ono što postoji.
-      </p>
+      <p class="eyebrow">{pocetna.heroNadnaslov || site.uloga}</p>
+      <h1 class="hero__title">{pocetna.heroNaslov}</h1>
+      <p class="hero__text">{pocetna.heroTekst}</p>
       <div class="button-row">
-        <a class="button button--solid" href="/galerija/">Pogledaj galeriju</a>
-        <a class="button" href="/kontakt/">Naruči ili pitaj</a>
+        <a class="button button--solid" href="/galerija/">{pocetna.gumb1}</a>
+        <a class="button" href="/kontakt/">{pocetna.gumb2}</a>
       </div>
       {
         dostupno > 0 && (
@@ -39,7 +39,13 @@ const dostupno = radovi.filter((r) => r.data.status === 'dostupno').length;
     {
       heroImage && (
         <div class="hero__media">
-          <img src={heroImage} alt="" width="800" height="1000" fetchpriority="high" />
+          <img
+            src={heroImage}
+            alt={izbor[0]?.data.naziv ?? ''}
+            width="800"
+            height="1000"
+            fetchpriority="high"
+          />
         </div>
       )
     }
@@ -53,9 +59,9 @@ const dostupno = radovi.filter((r) => r.data.status === 'dostupno').length;
           <div
             style="display:flex;justify-content:space-between;align-items:baseline;gap:1rem;flex-wrap:wrap;margin-bottom:2rem"
           >
-            <h2 style="margin:0">Iz radionice</h2>
+            <h2 style="margin:0">{pocetna.izborNaslov}</h2>
             <a class="button button--ghost" href="/galerija/">
-              Svi radovi &rarr;
+              {pocetna.izborVeza} &rarr;
             </a>
           </div>
           <ul class="grid">
@@ -72,24 +78,18 @@ const dostupno = radovi.filter((r) => r.data.status === 'dostupno').length;
 
   <hr class="rule" />
   <section class="wrap section">
-    <div style="display:grid;gap:2rem;grid-template-columns:repeat(auto-fit,minmax(min(100%,20rem),1fr))">
+    <div
+      style="display:grid;gap:2rem;grid-template-columns:repeat(auto-fit,minmax(min(100%,20rem),1fr))"
+    >
       <div>
-        <h2>O radu</h2>
-        <p class="lede">
-          Keramika je spora. Glina se suši danima, glazura se ne ponaša onako
-          kako si zamislio, a peć odlučuje umjesto tebe. Zato svaki komad nosi
-          trag ruke koja ga je napravila.
-        </p>
-        <a class="button" href="/o-meni/">Više o meni</a>
+        <h2>{pocetna.blok1Naslov}</h2>
+        <p class="lede">{pocetna.blok1Tekst}</p>
+        <a class="button" href="/o-meni/">{pocetna.blok1Gumb}</a>
       </div>
       <div>
-        <h2>Kako kupiti</h2>
-        <p class="lede">
-          Za sada bez košarice i bez automatike — javite se mailom ili preko
-          Instagrama, dogovorimo plaćanje i dostavu. Rad je rezerviran čim se
-          čujemo.
-        </p>
-        <a class="button" href="/kontakt/">Kontakt</a>
+        <h2>{pocetna.blok2Naslov}</h2>
+        <p class="lede">{pocetna.blok2Tekst}</p>
+        <a class="button" href="/kontakt/">{pocetna.blok2Gumb}</a>
       </div>
     </div>
   </section>
