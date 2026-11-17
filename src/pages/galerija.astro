@@ -1,0 +1,57 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import PieceCard from '../components/PieceCard.astro';
+import { sortRadovi } from '../lib/radovi';
+import site from '../data/site.json';
+
+const radovi = sortRadovi(await getCollection('radovi'));
+const dostupno = radovi.filter((r) => r.data.status === 'dostupno').length;
+const prodano = radovi.filter((r) => r.data.status === 'prodano').length;
+const showPrices = site.prikaziCijene === true;
+
+const plural = (n: number) => (n === 1 ? 'rad' : n < 5 ? 'rada' : 'radova');
+---
+
+<Base
+  title="Galerija"
+  description="Pregled svih keramičkih radova — dostupni komadi i prodani radovi iz arhive."
+>
+  <div class="wrap page-head">
+    <h1>Galerija</h1>
+    <p class="lede">
+      {radovi.length}
+      {plural(radovi.length)} u katalogu.
+      {
+        prodano > 0 && (
+          <>
+            Prodani radovi ostaju ovdje kao pregled rada{showPrices
+              ? ', a dostupni se mogu kupiti.'
+              : '.'}
+          </>
+        )
+      }
+    </p>
+  </div>
+
+  <section class="wrap section">
+    {
+      radovi.length === 0 ? (
+        <div class="empty">
+          <p>Još nema objavljenih radova.</p>
+          <p style="margin:0;font-size:0.9rem">
+            Radovi se dodaju u <code>src/content/radovi/</code>.
+          </p>
+        </div>
+      ) : (
+        <ul class="grid">
+          {radovi.map((rad) => (
+            <li>
+              <PieceCard rad={rad} />
+            </li>
+          ))}
+        </ul>
+      )
+    }
+  </section>
+</Base>

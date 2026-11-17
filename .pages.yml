@@ -1,0 +1,201 @@
+# Konfiguracija za Pages CMS (https://app.pagescms.org)
+# Ovo je jedino što CMS čita. Držati usklađeno sa src/content.config.ts.
+
+media:
+  input: public/uploads
+  output: /uploads
+  rename: safe
+  categories: [image]
+
+settings:
+  content:
+    # Ne briši polja koja nisu u shemi (npr. polja koja ja dodam ručno)
+    merge: true
+  commit:
+    identity: user
+    templates:
+      create: "rad: dodan {filename}"
+      update: "rad: izmijenjen {filename}"
+      delete: "rad: obrisan {filename}"
+      rename: "rad: preimenovan {oldFilename} -> {newFilename}"
+
+content:
+  - name: radovi
+    label: Radovi
+    type: collection
+    path: src/content/radovi
+    filename:
+      template: "{primary}.md"
+      field: false
+    view:
+      fields: [naziv, status, godina, cijena]
+      primary: naziv
+      sort: [naziv, godina, status]
+      search: [naziv, tehnika]
+      default:
+        sort: naziv
+        order: asc
+    fields:
+      - name: naziv
+        label: Naziv rada
+        type: string
+        required: true
+        description: Kako se rad zove na stranici, npr. "Velika vaza s plavom glazurom".
+
+      - name: naslovnica
+        label: Glavna fotografija
+        type: image
+        required: true
+        options:
+          categories: [image]
+          rename: safe
+        description: Prva fotografija — prikazuje se u galeriji i na vrhu stranice rada.
+
+      - name: galerija
+        label: Ostale fotografije
+        type: image
+        options:
+          multiple:
+            max: 12
+          unique: true
+          categories: [image]
+          rename: safe
+          extensions: [jpg, jpeg, png, webp]
+        description: Dodatne fotografije (detalji, druga strana, rad u prostoru). Nije obavezno.
+
+      - name: status
+        label: Status
+        type: select
+        required: true
+        options:
+          values:
+            - name: dostupno
+              label: Dostupno
+            - name: rezervirano
+              label: Rezervirano
+            - name: prodano
+              label: Prodano (ostaje u arhivi)
+        description: Prodani radovi ostaju vidljivi u arhivi galerije.
+
+      - name: cijena
+        label: Cijena (€)
+        type: number
+        options:
+          min: 0
+        description: Samo broj, bez znaka €. Ostavi prazno ako je cijena "na upit".
+
+      - name: godina
+        label: Godina
+        type: number
+
+      - name: tehnika
+        label: Tehnika / materijal
+        type: string
+        description: npr. "kolačarska glina, plava glazura, 1240 °C"
+
+      - name: dimenzije
+        label: Dimenzije
+        type: string
+        description: npr. "visina 24 cm, promjer 12 cm"
+
+      - name: istaknuto
+        label: Istakni na naslovnici
+        type: boolean
+        default: false
+        description: Prikazuje se u izboru na početnoj stranici.
+
+      - name: redoslijed
+        label: Redoslijed
+        type: number
+        default: 0
+        description: Manji broj = ranije u galeriji. Za većinu radova ostavi 0.
+
+      - name: body
+        label: Opis rada
+        type: rich-text
+        options:
+          format: markdown
+          media: false
+
+  - name: stranice
+    label: Stranice
+    type: collection
+    path: src/content/stranice
+    filename:
+      template: "{primary}.md"
+      field: false
+    view:
+      fields: [naslov]
+      primary: naslov
+    fields:
+      - name: naslov
+        label: Naslov
+        type: string
+        required: true
+
+      - name: podnaslov
+        label: Podnaslov
+        type: string
+
+      - name: redoslijed
+        label: Redoslijed
+        type: number
+        default: 0
+
+      - name: body
+        label: Tekst
+        type: rich-text
+        options:
+          format: markdown
+          media: false
+
+  - name: postavke
+    label: Postavke stranice
+    type: file
+    path: src/data/site.json
+    format: json
+    fields:
+      - name: naziv
+        label: Naziv studija
+        type: string
+        required: true
+
+      - name: opis
+        label: Kratki opis (za Google)
+        type: text
+        description: Jedna rečenica koja se prikazuje u rezultatima pretrage.
+
+      - name: uloga
+        label: Podnaslov / zanimanje
+        type: string
+        description: npr. "ručno rađena keramika, Zagreb"
+
+      - name: prikaziCijene
+        label: Prikaži cijene
+        type: boolean
+        default: false
+        description: >-
+          Isključeno = cijene se ne prikazuju nigdje na stranici (radovi se
+          nude "na upit"). Uključi kad krene prodaja. Cijene u radovima ostaju
+          sačuvane, samo se skrivaju.
+
+      - name: email
+        label: E-mail za upite
+        type: string
+        required: true
+
+      - name: telefon
+        label: Telefon
+        type: string
+
+      - name: instagram
+        label: Instagram (puna poveznica)
+        type: string
+
+      - name: lokacija
+        label: Lokacija
+        type: string
+
+      - name: radionica
+        label: Adresa radionice / posjeta po dogovoru
+        type: text

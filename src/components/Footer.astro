@@ -1,0 +1,30 @@
+---
+import site from '../data/site.json';
+
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer">
+  <div class="wrap site-footer__inner">
+    <div>
+      <span class="site-footer__brand">{site.naziv}</span>
+      {site.lokacija && <span>{site.lokacija}</span>}
+    </div>
+    <div>
+      <a href={`mailto:${site.email}`}>{site.email}</a>
+      {
+        site.instagram && (
+          <>
+            {' · '}
+            <a href={site.instagram} rel="noopener me" target="_blank">
+              Instagram
+            </a>
+          </>
+        )
+      }
+    </div>
+    <div>
+      © {year} {site.naziv}. Sva prava pridržana.
+    </div>
+  </div>
+</footer>

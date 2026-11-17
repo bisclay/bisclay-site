@@ -1,0 +1,96 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import PieceCard from '../components/PieceCard.astro';
+import { sortRadovi } from '../lib/radovi';
+import site from '../data/site.json';
+
+const radovi = sortRadovi(await getCollection('radovi'));
+const istaknuti = radovi.filter((r) => r.data.istaknuto).slice(0, 3);
+const izbor = istaknuti.length > 0 ? istaknuti : radovi.slice(0, 3);
+const heroImage = izbor[0]?.data.naslovnica ?? radovi[0]?.data.naslovnica;
+const dostupno = radovi.filter((r) => r.data.status === 'dostupno').length;
+---
+
+<Base description={site.opis}>
+  <section class="wrap hero">
+    <div>
+      <p class="eyebrow">{site.uloga}</p>
+      <h1 class="hero__title">
+        Zemlja, voda, vatra — i malo strpljenja.
+      </h1>
+      <p class="hero__text">
+        Svaki komad je ručno oblikovan i pečen, jedan po jedan. Nema serije,
+        nema dva ista. Ono što vidite je ono što postoji.
+      </p>
+      <div class="button-row">
+        <a class="button button--solid" href="/galerija/">Pogledaj galeriju</a>
+        <a class="button" href="/kontakt/">Naruči ili pitaj</a>
+      </div>
+      {
+        dostupno > 0 && (
+          <p class="price-note" style="margin-top:1.5rem">
+            Trenutno dostupno: {dostupno}{' '}
+            {dostupno === 1 ? 'rad' : dostupno < 5 ? 'rada' : 'radova'}
+          </p>
+        )
+      }
+    </div>
+    {
+      heroImage && (
+        <div class="hero__media">
+          <img src={heroImage} alt="" width="800" height="1000" fetchpriority="high" />
+        </div>
+      )
+    }
+  </section>
+
+  {
+    izbor.length > 0 && (
+      <>
+        <hr class="rule" />
+        <section class="wrap section">
+          <div
+            style="display:flex;justify-content:space-between;align-items:baseline;gap:1rem;flex-wrap:wrap;margin-bottom:2rem"
+          >
+            <h2 style="margin:0">Iz radionice</h2>
+            <a class="button button--ghost" href="/galerija/">
+              Svi radovi &rarr;
+            </a>
+          </div>
+          <ul class="grid">
+            {izbor.map((rad) => (
+              <li>
+                <PieceCard rad={rad} />
+              </li>
+            ))}
+          </ul>
+        </section>
+      </>
+    )
+  }
+
+  <hr class="rule" />
+  <section class="wrap section">
+    <div style="display:grid;gap:2rem;grid-template-columns:repeat(auto-fit,minmax(min(100%,20rem),1fr))">
+      <div>
+        <h2>O radu</h2>
+        <p class="lede">
+          Keramika je spora. Glina se suši danima, glazura se ne ponaša onako
+          kako si zamislio, a peć odlučuje umjesto tebe. Zato svaki komad nosi
+          trag ruke koja ga je napravila.
+        </p>
+        <a class="button" href="/o-meni/">Više o meni</a>
+      </div>
+      <div>
+        <h2>Kako kupiti</h2>
+        <p class="lede">
+          Za sada bez košarice i bez automatike — javite se mailom ili preko
+          Instagrama, dogovorimo plaćanje i dostavu. Rad je rezerviran čim se
+          čujemo.
+        </p>
+        <a class="button" href="/kontakt/">Kontakt</a>
+      </div>
+    </div>
+  </section>
+</Base>

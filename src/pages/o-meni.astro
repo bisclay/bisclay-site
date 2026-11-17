@@ -1,0 +1,20 @@
+---
+import { getEntry, render } from 'astro:content';
+import Base from '../layouts/Base.astro';
+
+const entry = await getEntry('stranice', 'o-meni');
+const { Content } = await render(entry);
+const { naslov, podnaslov } = entry.data;
+---
+
+<Base title={naslov} description={podnaslov}>
+  <div class="wrap page-head">
+    <h1>{naslov}</h1>
+    {podnaslov && <p class="lede">{podnaslov}</p>}
+  </div>
+  <div class="wrap section">
+    <div class="prose">
+      <Content />
+    </div>
+  </div>
+</Base>

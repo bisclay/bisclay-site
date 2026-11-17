@@ -1,0 +1,82 @@
+---
+import { getEntry, render } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import site from '../data/site.json';
+
+const entry = await getEntry('stranice', 'kontakt');
+const Content = entry ? (await render(entry)).Content : null;
+const { naslov, podnaslov } = entry?.data ?? {
+  naslov: 'Kontakt',
+  podnaslov: undefined,
+};
+---
+
+<Base title={naslov} description="Naručivanje, dostava i pitanja o radovima.">
+  <div class="wrap page-head">
+    <h1>{naslov}</h1>
+    {podnaslov && <p class="lede">{podnaslov}</p>}
+  </div>
+
+  <div class="wrap section">
+    <div
+      style="display:grid;gap:3rem;grid-template-columns:repeat(auto-fit,minmax(min(100%,20rem),1fr));align-items:start"
+    >
+      <div>
+        <table class="specs">
+          <tbody>
+            <tr>
+              <th>E-mail</th>
+              <td><a href={`mailto:${site.email}`}>{site.email}</a></td>
+            </tr>
+            {
+              site.telefon && (
+                <tr>
+                  <th>Telefon</th>
+                  <td><a href={`tel:${site.telefon.replace(/\s/g, '')}`}>{site.telefon}</a></td>
+                </tr>
+              )
+            }
+            {
+              site.instagram && (
+                <tr>
+                  <th>Instagram</th>
+                  <td>
+                    <a href={site.instagram} rel="noopener me" target="_blank">
+                      {site.instagram}
+                    </a>
+                  </td>
+                </tr>
+              )
+            }
+            {
+              site.lokacija && (
+                <tr>
+                  <th>Lokacija</th>
+                  <td>{site.lokacija}</td>
+                </tr>
+              )
+            }
+            {
+              site.radionica && (
+                <tr>
+                  <th>Radionica</th>
+                  <td>{site.radionica}</td>
+                </tr>
+              )
+            }
+          </tbody>
+        </table>
+
+        <div class="button-row">
+          <a class="button button--solid" href={`mailto:${site.email}`}>
+            Pošalji e-mail
+          </a>
+        </div>
+      </div>
+
+      <div class="prose">
+        {Content ? <Content /> : <p>Javite se mailom za narudžbe i pitanja.</p>}
+      </div>
+    </div>
+  </div>
+</Base>

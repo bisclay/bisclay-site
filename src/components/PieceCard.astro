@@ -1,0 +1,47 @@
+---
+import type { Rad } from '../lib/radovi';
+import { formatPrice } from '../lib/radovi';
+import site from '../data/site.json';
+
+interface Props {
+  rad: Rad;
+}
+
+const { rad } = Astro.props;
+const { naziv, naslovnica, status, cijena, godina, tehnika } = rad.data;
+
+// Cijena se prikazuje samo ako je uključena u postavkama stranice.
+const showPrices = site.prikaziCijene === true;
+const price = showPrices ? formatPrice(cijena) : null;
+const meta = [tehnika, godina?.toString()].filter(Boolean).join(' · ');
+---
+
+<a
+  class:list={['card', status === 'prodano' && 'card--sold']}
+  href={`/rad/${rad.id}/`}
+>
+  <div class="card__media">
+    <img
+      src={naslovnica}
+      alt={naziv}
+      loading="lazy"
+      decoding="async"
+      width="800"
+      height="1000"
+    />
+    {
+      status !== 'dostupno' && (
+        <span class:list={['badge', `badge--${status}`]}>
+          {status === 'rezervirano' ? 'Rezervirano' : 'Prodano'}
+        </span>
+      )
+    }
+  </div>
+  <div class="card__body">
+    <div>
+      <h3 class="card__title">{naziv}</h3>
+      {meta && <p class="card__meta">{meta}</p>}
+    </div>
+    {price && status === 'dostupno' && <span class="card__price">{price}</span>}
+  </div>
+</a>

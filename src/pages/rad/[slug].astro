@@ -1,0 +1,118 @@
+---
+import { getCollection, render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import { formatPrice } from '../../lib/radovi';
+import site from '../../data/site.json';
+
+export async function getStaticPaths() {
+  const radovi = await getCollection('radovi');
+  return radovi.map((rad) => ({
+    params: { slug: rad.id },
+    props: { rad },
+  }));
+}
+
+const { rad } = Astro.props;
+const { Content } = await render(rad);
+const { naziv, naslovnica, galerija, status, cijena, godina, tehnika, dimenzije } =
+  rad.data;
+
+const price = site.prikaziCijene === true ? formatPrice(cijena) : null;
+const slike = [naslovnica, ...galerija];
+
+const statusLabel =
+  status === 'dostupno' ? 'Dostupno' : status === 'rezervirano' ? 'Rezervirano' : 'Prodano';
+
+const upit = `mailto:${site.email}?subject=${encodeURIComponent(
+  `Upit za rad: ${naziv}`,
+)}&body=${encodeURIComponent(`Poštovani,\n\nzanima me rad "${naziv}" (${site.naziv}).\n\n`)}`;
+---
+
+<Base title={naziv} description={`${naziv} — ${tehnika ?? 'keramika'}`} image={naslovnica}>
+  <div class="wrap">
+    <nav class="site-footer" style="border:0;margin:0;padding:1.25rem 0;font-size:0.85rem">
+      <a href="/galerija/">&larr; Natrag na galeriju</a>
+    </nav>
+
+    <article class="piece">
+      <div class="piece__gallery">
+        {
+          slike.map((slika, i) => (
+            <figure>
+              <img
+                src={slika}
+                alt={`${naziv}${i > 0 ? ` — detalj ${i}` : ''}`}
+                loading={i === 0 ? 'eager' : 'lazy'}
+                decoding="async"
+              />
+            </figure>
+          ))
+        }
+      </div>
+
+      <aside class="piece__aside">
+        <p class="eyebrow">{statusLabel}</p>
+        <h1>{naziv}</h1>
+
+        {
+          status === 'dostupno' && price && (
+            <>
+              <p class="price">{price}</p>
+              <p class="price-note">PDV uključen. Dostava po dogovoru.</p>
+            </>
+          )
+        }
+        {
+          status === 'rezervirano' && (
+            <p class="price-note">
+              Ovaj rad je trenutno rezerviran. Javite se — sličan se može izraditi po narudžbi.
+            </p>
+          )
+        }
+        {
+          status === 'prodano' && (
+            <p class="price-note">Prodano. Sličan rad se može naručiti.</p>
+          )
+        }
+
+        <table class="specs">
+          <tbody>
+            {tehnika && (
+              <tr>
+                <th>Tehnika</th>
+                <td>{tehnika}</td>
+              </tr>
+            )}
+            {dimenzije && (
+              <tr>
+                <th>Dimenzije</th>
+                <td>{dimenzije}</td>
+              </tr>
+            )}
+            {godina && (
+              <tr>
+                <th>Godina</th>
+                <td>{godina}</td>
+              </tr>
+            )}
+            <tr>
+              <th>Status</th>
+              <td>{statusLabel}</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="button-row" style="margin-top:0.5rem">
+          <a class="button button--solid" href={upit}>
+            {status === 'dostupno' ? 'Zanima me ovaj rad' : 'Pitaj za sličan rad'}
+          </a>
+          <a class="button" href="/kontakt/">Kontakt</a>
+        </div>
+
+        <div class="prose" style="margin-top:2.5rem">
+          <Content />
+        </div>
+      </aside>
+    </article>
+  </div>
+</Base>

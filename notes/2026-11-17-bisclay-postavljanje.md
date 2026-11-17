@@ -1,0 +1,59 @@
+# 2026-11-17 — BisClay postavljanje
+
+## Cilj
+
+Statična portfolio stranica za maminu keramiku na `bisclay.com`, s mogućnošću da sama
+uređuje sadržaj, i s modelom podataka koji kasnije prima webshop.
+
+## Odluke
+
+| Odluka | Odabir | Zašto |
+|---|---|---|
+| Generator | Astro 5 | Statični izlaz, content collections (čista shema za CMS), bez JS-a na klijentu |
+| Hosting | GitHub Pages + Actions | Besplatno, HTTPS, custom domena preko `public/CNAME` |
+| CMS | Pages CMS (`app.pagescms.org`) | Hosted git-CMS: **nema OAuth proxyja** (za razliku od Decap/Sveltia na GH Pages) |
+| Uređivač | e-mail collaborator | Mama ne treba GitHub račun ni 2FA; ne vidi ostale repo-e, ne može dirati `.pages.yml` |
+| Webshop | odgođen | `cijena` + `status` u shemi; Stripe Payment Links kasnije bez migracije |
+
+Odbijeno: Decap CMS (traži Cloudflare Worker + OAuth app za GH Pages), Snipcart u v1
+(naknada, pretjerano za unikatne komade), Shopify (overkill).
+
+## Što je napravljeno
+
+- Astro projekt u `/home/lovro/huskanje-llma/bisclay`
+- Rute: `/`, `/galerija/`, `/rad/<slug>/`, `/o-meni/`, `/kontakt/`, `/404.html`
+- Content collections `radovi` i `stranice` (zod shema u `src/content.config.ts`)
+- `.pages.yml` — CMS shema: Radovi, Stranice, Postavke stranice (site.json)
+- `settings.commit.identity: user` da commitovi nose mamino ime
+- Deploy workflow (`.github/workflows/deploy.yml`), `public/CNAME` = bisclay.com
+- 3 primjera rada + 2 tekstualne stranice + SVG placeholderi
+- `scripts/optimize-uploads.mjs` — ručna WebP optimizacija slika
+- `npm run build` prolazi: 8 stranica
+
+## Izmjene nakon prvog prolaza
+
+**Cijene skrivene po defaultu.** Dodan prekidač `prikaziCijene` (bool) u `src/data/site.json`,
+uređuje se u CMS-u pod *Postavke stranice*. Kad je `false`: nigdje se ne prikazuje cijena
+(ni na karticama ni na stranici rada, ni napomena o PDV-u) — ostaje samo gumb za kontakt.
+Polja `cijena` u sadržaju se ne brišu, pa se uključivanje svodi na jedan klik.
+Provjereno buildom u oba stanja.
+
+**Prodani radovi više nisu "arhiva".** Uklonjena je odvojena sekcija "Arhiva — prodano"
+i CSS filter (grayscale + opacity). Sada svi radovi stoje u istoj galeriji, sortirani
+tako da dostupni idu prvi, a prodani nose samo značku **Prodano** i prigušen naslov.
+Razlog: stranica je portfolio, prodani komad je dokaz rada, a ne ostatak.
+
+## Otvoreno / sljedeće
+
+- [ ] Push u organizaciju, uključiti Pages (source: GitHub Actions)
+- [ ] DNS A/AAAA zapisi za apex + `www` CNAME
+- [ ] Pages CMS: GitHub App na **samo** `bisclay` repo, pozvati mamu mailom
+- [ ] Zamijeniti tekst na početnoj i "O meni" stvarnim tekstom
+- [ ] Odlučiti je li potreban engleski (trenutno samo hrvatski)
+- [ ] Kad krene prodaja: Stripe Payment Links + provjera PDV praga
+
+## Napomene
+
+- Slike idu u `public/uploads/` i poslužuju se neoptimizirane — namjerno, da build
+  ne pada zbog krive putanje koju je CMS upisao. Cijena: veće slike, zato `npm run optimize`.
+- Shema se mora mijenjati na dva mjesta: `src/content.config.ts` **i** `.pages.yml`.
