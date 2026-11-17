@@ -10,9 +10,9 @@ interface Props {
 const { rad } = Astro.props;
 const { naziv, naslovnica, status, cijena, godina, tehnika } = rad.data;
 
-// Cijena se prikazuje samo ako je uključena u postavkama stranice.
-const showPrices = site.prikaziCijene === true;
-const price = showPrices ? formatPrice(cijena) : null;
+// `prodaja` je glavni prekidač: dok je isključen, stranica je čisti portfolio.
+const shop = site.prodaja === true;
+const price = shop ? formatPrice(cijena) : null;
 const meta = [tehnika, godina?.toString()].filter(Boolean).join(' · ');
 ---
 

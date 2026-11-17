@@ -6,7 +6,7 @@ Statična stranica za keramički portfolio — **bisclay.com**.
 - **Hosting:** GitHub Pages preko GitHub Actions
 - **Uređivanje:** [Pages CMS](https://app.pagescms.org) — mama uređuje sadržaj kroz web sučelje, bez Gita
 - **Webshop:** za sada nema. Model podataka već ima `cijena` i `status`, pa se Stripe Payment Links mogu dodati bez preslagivanja.
-- **Cijene:** skrivene dok je `prikaziCijene: false` u `src/data/site.json`. Uključuje se jednim prekidačem u CMS-u (**Postavke stranice → Prikaži cijene**). Cijene u radovima ostaju zapisane, samo se ne prikazuju.
+- **Način rada:** trenutno je stranica **čisti portfolio** — jedan prekidač, `prodaja: false` u `src/data/site.json` (**Postavke stranice → Prodaja uključena**). Dok je isključen, nigdje se ne prikazuje cijena, gumb za kupnju ni oznaka dostupnosti. Cijene i statusi u radovima ostaju zapisani.
 
 ---
 
@@ -109,21 +109,25 @@ Ako se nakupi velikih slika, pokreni `npm run optimize`.
 Za EU prodaju: provjeri prag za PDV s knjigovođom prije prve prodaje; koristi Stripe Tax
 umjesto ručnog obračuna.
 
-## Cijene — kako rade
+## Portfolio mod i prodaja — jedan prekidač
 
-Prekidač je `prikaziCijene` u `src/data/site.json`, uređuje se u CMS-u pod **Postavke stranice**.
+Prekidač je `prodaja` (bool) u `src/data/site.json`, uređuje se u CMS-u pod
+**Postavke stranice → Prodaja uključena**. To je jedina razlika između "portfolio"
+i "webshop" stanja — nema drugog koda za paliti.
 
-| `prikaziCijene` | Ponašanje |
+| `prodaja` | Što se prikazuje |
 |---|---|
-| `false` (sada) | Cijena se ne prikazuje nigdje. Kartice bez cijene, stranica rada bez cijene i bez napomene o PDV-u. Ostaje samo gumb za kontakt. |
-| `true` | Cijena se prikazuje na karticama (samo za `dostupno`) i na stranici rada, uz napomenu "PDV uključen". |
+| `false` (**sada**) | Čisti portfolio. Nema cijene na karticama ni na stranici rada, nema napomene o PDV-u, nema gumba "Zanima me ovaj rad", nema retka "Status: Dostupno" ni brojača "Trenutno dostupno". Iznad naslova rada stoji **godina**. Jedini gumb je neutralni **Kontakt**. |
+| `true` | Cijena na karticama i na stranici rada (+ "PDV uključen"), značka i redak statusa, gumbi za upit/narudžbu, brojač dostupnih radova na naslovnici. |
 
-Polja `cijena` u `src/content/radovi/*.md` se **ne brišu** kad je prekidač isključen —
-popuni ih odmah, a prikaz uključi kad zatreba.
+Polja `cijena` i `status` u `src/content/radovi/*.md` se **ne brišu** kad je prekidač
+isključen — popuni ih odmah, a prikaz uključi kad zatreba. Provjereno buildom u oba
+stanja: u portfolio modu u generiranom HTML-u nema ni jedne prodajne fraze.
 
-Prodani radovi (`status: prodano`) ostaju u galeriji trajno, kao portfolio. Nemaju
-sivilo ni zamućenje — samo značku **Prodano** i prigušen naslov. Nikad ih ne briši;
-oni su dokaz rada, ne ostatak.
+Prodani radovi (`status: prodano`) ostaju u galeriji trajno, svi u istom gridu,
+sa značkom **Prodano** i prigušenim naslovom, bez sivila. Na stranici rada piše
+samo "Prodano." — bez poziva na narudžbu dok je `prodaja` isključena.
+Nikad ih ne briši; oni su dokaz rada, ne ostatak.
 
 ## Napomene
 

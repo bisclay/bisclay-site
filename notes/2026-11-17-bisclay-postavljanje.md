@@ -76,6 +76,22 @@ ova velika slika, tekstovi gumba, naslov izbora radova, dva bloka na dnu).
 - Provjereno: skup polja u `.pages.yml` i ključeva u JSON-u se poklapa 1:1;
   smoke test (promjena naslova → rebuild → `grep` u `dist/index.html`) prolazi.
 
+**Portfolio mod umjesto prodaje (2026-11-17).** Stranica se sada predstavlja kao portfolio,
+ne kao dućan. Skela za prodaju je ostala netaknuta — jedno polje i jedan prekidač.
+
+- `prikaziCijene` → preimenovano u **`prodaja`** (`src/data/site.json`), jer više ne
+  skriva samo cijene: to je glavni prekidač cijelog komercijalnog sloja.
+- Kad je `prodaja: false` (sada), skriveno je: cijena na karticama i na stranici rada,
+napomena o PDV-u, gumbi "Zanima me ovaj rad" / "Pitaj za sličan rad", redak
+  "Status: Dostupno", brojač "Trenutno dostupno" na naslovnici. Iznad naslova rada
+  umjesto statusa stoji godina. Ostaje jedan neutralni gumb **Kontakt**.
+- Prepisan copy: naslovnica (`gumb2` "Naruči ili pitaj" → "Kontakt"; blok "Kako kupiti"
+  → "Posjet radionici"), `kontakt.md` (nema više "Kako naručiti", "Dostava",
+  "Po narudžbi"), `salica-riton.md` (nema "može se naručiti"), meta opis galerije.
+- Značka **Prodano** na karticama ostaje — to je činjenica o radu, ne ponuda.
+- Provjereno: build u portfolio modu → grep po `dist/` ne nalazi ni jednu prodajnu
+  frazu; build s `prodaja: true` vraća cijene (`120 €`), PDV napomenu, status i gumbe.
+
 ## Otvoreno / sljedeće
 
 - [x] Push u organizaciju, uključiti Pages (source: GitHub Actions)

@@ -245,14 +245,15 @@ content:
         type: string
         description: npr. "ručno rađena keramika, Zagreb"
 
-      - name: prikaziCijene
-        label: Prikaži cijene
+      - name: prodaja
+        label: Prodaja uključena
         type: boolean
         default: false
         description: >-
-          Isključeno = cijene se ne prikazuju nigdje na stranici (radovi se
-          nude "na upit"). Uključi kad krene prodaja. Cijene u radovima ostaju
-          sačuvane, samo se skrivaju.
+          Isključeno = stranica je čisti portfolio: nema cijena, nema gumba za
+          kupnju ni narudžbu, nema oznake dostupnosti. Cijene i statusi u
+          radovima ostaju sačuvani, samo se ne prikazuju. Uključi kad krene
+          prodaja — tada se pojavljuju cijene, značke i gumbi za upit.
 
       - name: email
         label: E-mail za upite

@@ -6,16 +6,15 @@ import { sortRadovi } from '../lib/radovi';
 import site from '../data/site.json';
 
 const radovi = sortRadovi(await getCollection('radovi'));
-const dostupno = radovi.filter((r) => r.data.status === 'dostupno').length;
 const prodano = radovi.filter((r) => r.data.status === 'prodano').length;
-const showPrices = site.prikaziCijene === true;
+const shop = site.prodaja === true;
 
 const plural = (n: number) => (n === 1 ? 'rad' : n < 5 ? 'rada' : 'radova');
 ---
 
 <Base
   title="Galerija"
-  description="Pregled svih keramičkih radova — dostupni komadi i prodani radovi iz arhive."
+  description="Pregled svih keramičkih radova."
 >
   <div class="wrap page-head">
     <h1>Galerija</h1>
@@ -25,7 +24,7 @@ const plural = (n: number) => (n === 1 ? 'rad' : n < 5 ? 'rada' : 'radova');
       {
         prodano > 0 && (
           <>
-            Prodani radovi ostaju ovdje kao pregled rada{showPrices
+            Prodani radovi ostaju ovdje kao pregled rada{shop
               ? ', a dostupni se mogu kupiti.'
               : '.'}
           </>

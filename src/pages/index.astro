@@ -15,6 +15,7 @@ const heroImage =
   (pocetna.heroSlika && pocetna.heroSlika.trim()) || izbor[0]?.data.naslovnica;
 
 const dostupno = radovi.filter((r) => r.data.status === 'dostupno').length;
+const shop = site.prodaja === true;
 ---
 
 <Base description={site.opis} image={heroImage || undefined}>
@@ -28,7 +29,7 @@ const dostupno = radovi.filter((r) => r.data.status === 'dostupno').length;
         <a class="button" href="/kontakt/">{pocetna.gumb2}</a>
       </div>
       {
-        dostupno > 0 && (
+        shop && dostupno > 0 && (
           <p class="price-note" style="margin-top:1.5rem">
             Trenutno dostupno: {dostupno}{' '}
             {dostupno === 1 ? 'rad' : dostupno < 5 ? 'rada' : 'radova'}

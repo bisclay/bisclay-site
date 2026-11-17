@@ -17,11 +17,21 @@ const { Content } = await render(rad);
 const { naziv, naslovnica, galerija, status, cijena, godina, tehnika, dimenzije } =
   rad.data;
 
-const price = site.prikaziCijene === true ? formatPrice(cijena) : null;
+// `prodaja` je glavni prekidač. Dok je isključen, stranica je čisti portfolio:
+// nema cijene, nema gumba za kupnju, nema oznake "dostupno".
+const shop = site.prodaja === true;
+
+const price = shop ? formatPrice(cijena) : null;
 const slike = [naslovnica, ...galerija];
 
 const statusLabel =
   status === 'dostupno' ? 'Dostupno' : status === 'rezervirano' ? 'Rezervirano' : 'Prodano';
+
+// U portfoliju status prikazujemo samo kad nešto znači (prodano/rezervirano).
+const showStatusRow = shop || status !== 'dostupno';
+
+// Iznad naslova: u prodaji status, inače godina — neutralno.
+const eyebrow = shop ? statusLabel : godina ? String(godina) : null;
 
 const upit = `mailto:${site.email}?subject=${encodeURIComponent(
   `Upit za rad: ${naziv}`,
@@ -51,11 +61,11 @@ const upit = `mailto:${site.email}?subject=${encodeURIComponent(
       </div>
 
       <aside class="piece__aside">
-        <p class="eyebrow">{statusLabel}</p>
+        {eyebrow && <p class="eyebrow">{eyebrow}</p>}
         <h1>{naziv}</h1>
 
         {
-          status === 'dostupno' && price && (
+          shop && status === 'dostupno' && price && (
             <>
               <p class="price">{price}</p>
               <p class="price-note">PDV uključen. Dostava po dogovoru.</p>
@@ -63,50 +73,75 @@ const upit = `mailto:${site.email}?subject=${encodeURIComponent(
           )
         }
         {
-          status === 'rezervirano' && (
+          shop && status === 'rezervirano' && (
             <p class="price-note">
               Ovaj rad je trenutno rezerviran. Javite se — sličan se može izraditi po narudžbi.
             </p>
           )
         }
         {
-          status === 'prodano' && (
+          shop && status === 'prodano' && (
             <p class="price-note">Prodano. Sličan rad se može naručiti.</p>
           )
+        }
+        {
+          !shop && status === 'prodano' && <p class="price-note">Prodano.</p>
         }
 
         <table class="specs">
           <tbody>
-            {tehnika && (
-              <tr>
-                <th>Tehnika</th>
-                <td>{tehnika}</td>
-              </tr>
-            )}
-            {dimenzije && (
-              <tr>
-                <th>Dimenzije</th>
-                <td>{dimenzije}</td>
-              </tr>
-            )}
-            {godina && (
-              <tr>
-                <th>Godina</th>
-                <td>{godina}</td>
-              </tr>
-            )}
-            <tr>
-              <th>Status</th>
-              <td>{statusLabel}</td>
-            </tr>
+            {
+              tehnika && (
+                <tr>
+                  <th>Tehnika</th>
+                  <td>{tehnika}</td>
+                </tr>
+              )
+            }
+            {
+              dimenzije && (
+                <tr>
+                  <th>Dimenzije</th>
+                  <td>{dimenzije}</td>
+                </tr>
+              )
+            }
+            {
+              godina && (
+                <tr>
+                  <th>Godina</th>
+                  <td>{godina}</td>
+                </tr>
+              )
+            }
+            {
+              showStatusRow && (
+                <tr>
+                  <th>Status</th>
+                  <td>{statusLabel}</td>
+                </tr>
+              )
+            }
           </tbody>
         </table>
 
         <div class="button-row" style="margin-top:0.5rem">
-          <a class="button button--solid" href={upit}>
-            {status === 'dostupno' ? 'Zanima me ovaj rad' : 'Pitaj za sličan rad'}
-          </a>
-          <a class="button" href="/kontakt/">Kontakt</a>
+          {
+            shop ? (
+              <>
+                <a class="button button--solid" href={upit}>
+                  {status === 'dostupno' ? 'Zanima me ovaj rad' : 'Pitaj za sličan rad'}
+                </a>
+                <a class="button" href="/kontakt/">
+                  Kontakt
+                </a>
+              </>
+            ) : (
+              <a class="button button--ghost" href="/kontakt/">
+                Kontakt
+              </a>
+            )
+          }
         </div>
 
         <div class="prose" style="margin-top:2.5rem">
