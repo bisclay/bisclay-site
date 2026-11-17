@@ -1,6 +1,6 @@
 # BisClay — state & runbook (for agent runs)
 
-Last verified: **2026-11-17**. Written for whoever picks this up next — agent or human.
+Last verified: **2026-11-17 14:50Z**. Written for whoever picks this up next — agent or human.
 User-facing docs (`README.md`, `dns/README.md`) and all code comments are deliberately
 in **Croatian**; this file and future notes are in **English** so agent runs can move fast.
 
@@ -18,26 +18,43 @@ non-technical person through Pages CMS.
 | Repo | `bisclay/bisclay-site`, **public**, branch `main`, org `bisclay` |
 | HEAD | `478d393` — "portfolio mod: skriven prodajni sloj iza prekidača prodaja" |
 | Deploy | GitHub Actions (`.github/workflows/deploy.yml`) → Pages. Green. |
-| Pages API | `build_type: workflow`, `cname: bisclay.com`, `https_enforced: false` |
-| TLS cert | **not issued yet** — `https_certificate: null` |
+| Pages API | `build_type: workflow`, `cname: bisclay.com`, `https_enforced: true` |
+| TLS cert | **issued** — `CN=bisclay.com`, valid 2026-11-17 → **2027-02-15**, covers apex + `www` |
 | Registrar | Porkbun (transferred off Namecheap 2026-11-17) |
-| Registry NS | Porkbun (`curitiba/fortaleza/maceio/salvador.ns.porkbun.com`) |
+| Registry NS | Porkbun (`curitiba/fortaleza/maceio/salvador.ns.porkbun.com`), delegation TTL **172800 (48 h)** |
 | DNS records | 4×A → `185.199.10[8-1].153`; 4×AAAA → `2606:50c0:800[0-3]::153`; `www` CNAME → `bisclay.github.io` |
-| Propagation | **incomplete** — `1.1.1.1` still cached Namecheap NS at time of writing |
-| HTTP | `http://bisclay.com` serves the real site (200 + correct `<title>`) |
-| HTTPS | fails: GitHub still serves its `*.github.io` cert for our hostname |
+| HTTPS | **live** on all 4 edge IPs |
 | CMS | `app.pagescms.org`, GitHub App installed on this repo only |
 
-### The one remaining blocker
+### Network state to be aware of
 
-Propagation + Let's Encrypt. Nothing to code. When `https://` starts returning 200:
+- **`1.1.1.1` (Cloudflare) may still hand out the old Namecheap delegation** long after the
+  registry switched. Observed: it re-cached the stale answer (TTL 1157 → 1764, i.e. it
+  re-fetched and kept Namecheap). Test with `@8.8.8.8` / `@9.9.9.9` instead. If a human
+  reports "it shows a parking page", that's why — their resolver, not the site.
+- **HTTP root quirk:** with `https_enforced: true`, every path 301s to HTTPS *except* the
+  bare `/`, which still serves 200 over HTTP (`/index.html`, `/galerija/`, 404s all
+  redirect). Content is fully public, so this is cosmetic. Don't chase it.
+
+### How the cert finally landed (reproducible)
+
+The cert was issued at 13:45Z but the API reported `https_certificate: null` and the edge
+kept serving the `*.github.io` cert — the domain was never bound to it. Re-`PUT`ting the
+cname did nothing. **Removing the custom domain and re-adding it** flipped
+`https_certificate.state` from `null` → `authorization_pending` → `approved` within a
+minute, and HTTPS started serving ~1 min later. Remember this trick.
 
 ```bash
-gh api -X PUT repos/bisclay/bisclay-site/pages -f https_enforced=true
+gh api -X PUT repos/bisclay/bisclay-site/pages -f cname=""        # unbind
+gh api -X PUT repos/bisclay/bisclay-site/pages -f cname=bisclay.com  # re-bind, restarts issuance
 ```
 
-Do **not** set `https_enforced` before the cert exists — it 301s working HTTP into a
-failing TLS handshake.
+**Gotcha:** enforce HTTPS with a **typed** boolean (`-F`), not `-f`. `-f https_enforced=true`
+sends the string `"true"`, is accepted silently, and does nothing.
+
+```bash
+gh api -X PUT repos/bisclay/bisclay-site/pages -F https_enforced=true   # correct
+```
 
 ## Layout & where content lives
 
@@ -168,7 +185,7 @@ non-commercial) and **Netlify Free** (300 credits/mo ≈ 15 GB, then all sites p
 
 ## Open items
 
-- [ ] Wait for DNS propagation, then flip `https_enforced=true` once the cert lands
+- [x] HTTPS + cert (done 2026-11-17; see "How the cert finally landed")
 - [ ] Replace all placeholder copy (`pocetna.json`, `stranice/*.md`, 3 sample pieces)
 - [ ] Point `email` in `site.json` at a real address (`hello@bisclay.com` is a placeholder)
 - [ ] Invite the ceramicist as a Pages CMS email collaborator (Settings → Collaborators)
