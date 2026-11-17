@@ -1,120 +1,111 @@
-# DNS za bisclay.com
+# DNS za bisclay.com — Porkbun
 
-Kratka verzija: **ne treba ti svih 8 IP-eva, ali na apexu ne možeš imati CNAME.**
-Objašnjenje je niže, a gotova datoteka je [`bisclay.com.zone`](./bisclay.com.zone).
+Domena je prebačena na **Porkbun**. Do završetka transfera DNS još poslužuje
+Namecheap (`dns1/dns2.registrar-servers.com`) i apex još pokazuje na parking
+(`162.255.119.154`). Čim Porkbun nameserveri (`ns.porkbun.com`…) preuzmu,
+ažuriraj zapise po uputi niže.
 
-## Zašto `blog.oreskovic.me` ima samo CNAME, a `bisclay.com` ne može
+Porkbun ima dvije stvari koje Namecheap nije imao: **ALIAS (CNAME flattening)**
+i **URL Forwarding**. Zato na apexu više ne moraš pisati 4 A zapisa.
 
-Provjereno na tvom vlastitom DNS-u:
+---
 
-```
-blog.oreskovic.me  CNAME  oresk.github.io.     ← poddomena
-oreskovic.me       (ništa — nema A, AAAA ni CNAME)  ← apex
-```
+## Opcija A — ALIAS na apexu (preporučeno, bez promjena u repou)
 
-Razlika nije u GitHubu, nego u tome što `blog.` **je poddomena**, a `bisclay.com`
-**je vrh (apex)**.
+Porkbun ALIAS radi kao CNAME koji se razriješi u A/AAAA na njihovom DNS-u, pa
+GitHub Pages dobije zahtjev za `bisclay.com` i servira stranicu direktno.
+Nema redirecta, nema petlje, nema IP-eva u konfiguraciji.
 
-- Na **poddomeni** je `CNAME` normalan i dozvoljen. Razrješava se tako da resolver
-  ode po `oresk.github.io` i vrati njegova 4 A i 4 AAAA zapisa. Isti IP-evi,
-  samo ih ne moraš pisati — sakriveni su iza CNAME-a.
-- Na **apexu** CNAME nije dozvoljen (RFC 1034 §3.6.2 / RFC 2181 §10.1): apex
-  obavezno nosi `SOA` i `NS` zapise, a CNAME ne smije koegzistirati ni s čim
-  drugim. Zato GitHub za apex traži `ALIAS`, `ANAME` ili `A` zapise.
+**Account → Domain Management → bisclay.com → DNS**
 
-I pokus je to potvrdio: kad sam u zone file stavio `SOA` + `NS` + `CNAME` na `@`,
-parser ga odbija s *"CNAME rdataset is not compatible with a regular data node"*.
-Takva zona se ne može ni napisati, a kamoli poslužiti.
-
-Registrar može to zaobići samo ako podržava **ALIAS/ANAME** (Porkbun, DNSimple)
-ili **CNAME flattening** (Cloudflare). Namecheap BasicDNS ne podržava ni jedno.
-
-## Tri varijante — odaberi jednu
-
-### A. Apex + A/AAAA (trenutno postavljeno, `dns/bisclay.com.zone`)
-
-Stranica živi na `https://bisclay.com`. Radi na Namecheapu bez ikakvih dodatnih
-usluga. **Ovo je ono što je već konfigurirano na GitHubu** (`cname=bisclay.com`).
-
-| Tip | Host | Vrijednost |
+| Type | Host | Answer |
 |---|---|---|
-| A | `@` | `185.199.108.153` |
-| A | `@` | `185.199.109.153` |
-| A | `@` | `185.199.110.153` |
-| A | `@` | `185.199.111.153` |
-| AAAA | `@` | `2606:50c0:8000::153` |
-| AAAA | `@` | `2606:50c0:8001::153` |
-| AAAA | `@` | `2606:50c0:8002::153` |
-| AAAA | `@` | `2606:50c0:8003::153` |
+| ALIAS – CNAME flattening | *(ostavi prazno)* | `bisclay.github.io` |
 | CNAME | `www` | `bisclay.github.io` |
 
-**Može li manje?** Može, i to je legitimno:
+Repo ostaje kakav je: `public/CNAME` = `bisclay.com`, Pages `cname` = `bisclay.com`.
+Oba imena rade, GitHub sam preusmjeri `www` → apex.
 
-- **AAAA (4 zapisa) — slobodno izbriši.** GitHub ih sam navodi kao *"you can also
-  create AAAA records for IPv6 support"*. Bez njih stranica radi normalno, samo
-  nema IPv6.
-- **A zapisi — 1 je dovoljan, 4 su preporuka.** GitHub objavljuje 4 front-end
-  adrese za redundanciju. S jednom adresom stranica radi, ali ako taj front-end
-  ima problem, tvoja stranica je nedostupna. 4 retka koštaju ništa — ostavi ih.
+> Host polje u Porkbunu **nikad** ne sadrži ime domene. Za apex je prazno,
+> za `www` pišeš samo `www`.
 
-Minimum koji stvarno radi: `1 × A` + `www CNAME`. Preporuka: `4 × A` + `www CNAME`
-(bez AAAA). Ovo je i ono što pokazuje `dig` na `blog.oreskovic.me` — CNAME se
-razriješi u točno ta 4 A i 4 AAAA zapisa.
+## Opcija B — `www` je glavna adresa, apex forwarda na nju
 
-### B. Prelazak na Cloudflare — jedan zapis za apex
+Ovo je ono što si pitao. Tehnički radi, ali **nužno mijenja i repo** — vidi
+upozorenje ispod.
 
-Ako želiš "samo CNAME", jedini način je DNS provider koji flattena. Cloudflare
-to radi besplatno, ali **apex CNAME se unosi kroz sučelje, ne zone fileom** —
-upravo zato što takav zone file nije legalan (vidi gore).
+**Account → Domain Management → bisclay.com → URL Forwarding**
 
-1. Namecheap → Domain List → **Nameservers** → *Custom DNS* → Cloudflare NS
-2. Cloudflare → **DNS → Records** → dodaj dva zapisa:
+- Forward to: `https://www.bisclay.com`
+- Type: **Permanent (301)**
+- Include path: uključeno (da `/galerija/` ostane `/galerija/`)
 
-   | Type | Name | Target | Proxy |
-   |---|---|---|---|
-   | CNAME | `@` | `bisclay.github.io` | DNS only |
-   | CNAME | `www` | `bisclay.github.io` | DNS only |
+**DNS Records**
 
-3. Cloudflare ih automatski flattena u A/AAAA na rubu.
-
-Cijena: seliš nameservere i ovisiš o još jednom servisu. Dobitak: jedan zapis,
-brži DNS, i lakši prelazak na Cloudflare Pages ako jednog dana zatreba backend
-za webshop.
-
-### C. Kanonska domena `www`, apex preusmjerava
-
-Ako ti je draže da `www.bisclay.com` bude glavna adresa (kao `blog.` na drugim
-domenama), onda treba:
-
-| Tip | Host | Vrijednost |
+| Type | Host | Answer |
 |---|---|---|
 | CNAME | `www` | `bisclay.github.io` |
-| URL Redirect | `@` | `https://www.bisclay.com` |
 
-Ali tada **mijenja i repo**: `public/CNAME` → `www.bisclay.com` i Pages postavka
-`cname` → `www.bisclay.com`. Bez toga GitHub i dalje misli da je kanonska adresa
-apex i vrti redirect u krivom smjeru. Reci ako želiš ovu varijantu — promjena je
-dvije linije.
+Obavezno **obriši wildcard `*` zapis** koji Porkbun stvori uz URL Forwarding,
+i parking zapise (`pixie.porkbun.com` / A na praznom hostu).
 
-## Provjera nakon unosa
+Zatim u repou:
+
+1. `public/CNAME` → `www.bisclay.com`
+2. GitHub → Settings → Pages → Custom domain → `www.bisclay.com`
+
+### Zašto je to nužno — petlja preusmjeravanja
+
+GitHub Pages preusmjerava `www` na kanonsku domenu. Dok je kanonska `bisclay.com`:
+
+```
+browser → bisclay.com ──301──▶ www.bisclay.com     (Porkbun forwarding)
+                    ◀──301── bisclay.com           (GitHub: www → apex)
+                    ⟳  ERR_TOO_MANY_REDIRECTS
+```
+
+Ako ostaviš Pages na `bisclay.com`, a apex forwardaš na `www`, dobiješ petlju i
+stranica se ne otvori. Ili oba mijenjaj, ili (bolje) uzmi opciju A.
+
+---
+
+## Što obrisati prije dodavanja
+
+Porkbun na novo prebačene domene postavi parking zapise:
+
+- `A` na praznom hostu → `pixie.porkbun.com` / Porkbun IP
+- `CNAME *` wildcard
+
+Oba moraju nestati s imena koja koristiš, inače Porkbun javi
+*"A CNAME or ALIAS record with that host already exists"*. Wildcard ne ostavljaj
+ni iz sigurnosnih razloga (preuzimanje poddomena).
+
+**Ne diraj** MX/TXT/SPF zapise ako ih imaš za e-mail — ne utječu na web.
+
+## Provjera
 
 ```bash
-dig +short A bisclay.com          # očekuješ 4 × 185.199.10x.153
-dig +short AAAA bisclay.com       # 4 × 2606:50c0:...
-dig +short CNAME www.bisclay.com  # bisclay.github.io.
+dig +short A bisclay.com            # ALIAS → GitHubove 185.199.10x.153
+dig +short CNAME www.bisclay.com    # bisclay.github.io.
+curl -sI https://bisclay.com | head -3
 ```
 
-Kad se pojave GitHubove adrese: Settings → Pages → **Enforce HTTPS**.
-Certifikat GitHub izda sam, obično unutar 15 minuta od ispravnog DNS-a.
+Kad `dig` pokaže GitHubove adrese: Settings → Pages → **Enforce HTTPS**.
+Certifikat GitHub izda sam, obično unutar 15–60 minuta od ispravnog DNS-a.
+Ako GitHub u Settings → Pages zatraži verifikaciju domene, traži TXT zapis
+`_github-pages-challenge-bisclay` — vrijednost prepiši točno kako prikaže.
 
-## Što ne dirati
+## Zašto CNAME ne može na apex
 
-- **Parking zapise**: Namecheap default `A @ → 162.255.119.154` i
-  `www CNAME → parkingpage.namecheap.com` — oba moraju nestati, inače se
-  miješaju s GitHubovima.
-- **MX / TXT / SPF zapise** ako ih imaš za e-mail — ne diraju web, ostavi ih.
-- **Wildcard `*` zapise** — GitHub ih izričito odvjetuje (rizik od preuzimanja
-  poddomene).
-- Ako GitHub u Settings → Pages zatraži **verifikaciju domene**, traži
-  `_github-pages-challenge-bisclay` TXT zapis. Vrijednost prepiši točno kako
-  GitHub prikaže — ne izmišljaj je.
+RFC 1034 §3.6.2 / RFC 2181 §10.1: apex obavezno nosi `SOA` i `NS`, a CNAME ne
+smije koegzistirati ni s jednim drugim zapisom. Zato provjera zone filea s
+`SOA` + `NS` + `CNAME` na istom imenu puca s *"CNAME rdataset is not compatible
+with a regular data node"*. ALIAS/ANAME/flattening to zaobilaze na razini
+providera — zato Porkbun može, a zone file ne može.
+
+Tvoj `blog.oreskovic.me` je zato imao samo CNAME: to je **poddomena**, gdje je
+CNAME legalan. `oreskovic.me` (apex) tamo nema web zapisa uopće.
+
+`bisclay.com.zone` u ovom folderu je A-record varijanta — ostaje kao referenca
+za providere bez ALIAS-a. Porkbun je ne uvozi (nema import zone filea), pa je
+opcija A ionako dvije linije u sučelju.

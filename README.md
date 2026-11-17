@@ -58,22 +58,19 @@ npm run optimize # smanji fotografije u public/uploads/ na WebP
 3. **GitHub → repo → Settings → Pages → Source: GitHub Actions.**
    Workflow `.github/workflows/deploy.yml` se sam pokrene na svaki push.
 
-4. **DNS za bisclay.com** (kod registrara) — detalji, objašnjenja i gotov zone file:
-   [`dns/README.md`](dns/README.md) i [`dns/bisclay.com.zone`](dns/bisclay.com.zone)
+4. **DNS za bisclay.com** (Porkbun) — detalji: [`dns/README.md`](dns/README.md)
 
-   Ukratko (apex `@` + `www`):
+   Porkbun ima **ALIAS (CNAME flattening)**, pa na apexu ne treba 4 A zapisa:
 
-   | Tip | Ime | Vrijednost |
-   |-----|-----|-----------|
-   | A | `@` | `185.199.108.153` |
-   | A | `@` | `185.199.109.153` |
-   | A | `@` | `185.199.110.153` |
-   | A | `@` | `185.199.111.153` |
+   | Type | Host | Answer |
+   |------|------|--------|
+   | ALIAS – CNAME flattening | *(prazno)* | `bisclay.github.io` |
    | CNAME | `www` | `bisclay.github.io` |
 
-   AAAA (IPv6) zapisi nisu potrebni — zakomentirani su u zone fileu.
-   **CNAME na apexu nije dozvoljen** (RFC 2181); zato 4 A zapisa, a ne 1 CNAME.
-   Objašnjenje i alternativa (Cloudflare + jedan zapis) su u `dns/README.md`.
+   Prije toga obriši Porkbunove parking zapise (A na praznom hostu, `CNAME *`).
+   Repo ostaje kakav je: `public/CNAME` = `bisclay.com`, Pages `cname` = `bisclay.com`.
+   Vidi [`dns/bisclay.com.zone`](dns/bisclay.com.zone) — A-record varijanta za
+   providere bez ALIAS-a (Namecheap, GoDaddy).
 
    Zatim u Pages postavkama upiši `bisclay.com` i uključi **Enforce HTTPS**.
    `public/CNAME` već sadrži domenu, pa je GitHub neće izgubiti pri svakom deployu.

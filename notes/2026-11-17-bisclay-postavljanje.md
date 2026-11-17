@@ -54,8 +54,14 @@ Razlog: stranica je portfolio, prodani komad je dokaz rada, a ne ostatak.
 - `https_enforced` još `false` — uključiti nakon što DNS proradi i cert se izda
 - DNS (Namecheap BasicDNS) **još nije promijenjen**: A zapis `162.255.119.154`
   (parking) i `www` CNAME `parkingpage.namecheap.com` stoje dok se ne zamijene
-  GitHubovim A/AAAA zapisima. Do tada se stranica ne otvara (github.io URL
+  GitHubovim zapisima. Do tada se stranica ne otvara (github.io URL
   preusmjerava na bisclay.com nakon postavljanja custom domene).
+- **2026-11-17: domena prebačena na Porkbun** (whois: `Registrar: Porkbun LLC`),
+  ali NS su još Namecheapovi i apex još pokazuje na parking → transfer u toku.
+  Porkbun ima ALIAS (CNAME flattening), pa na apexu ne treba 4 A zapisa:
+  `ALIAS (prazan host) → bisclay.github.io` + `CNAME www → bisclay.github.io`.
+  Detalji i upozorenje o redirect petlji (ako se odabere `www` kao kanonska
+  adresa): `dns/README.md`.
 
 ## Otvoreno / sljedeće
 
