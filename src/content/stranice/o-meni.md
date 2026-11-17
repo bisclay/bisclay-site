@@ -3,7 +3,7 @@ naslov: O meni
 podnaslov: Keramika, tišina i puno strpljenja.
 redoslijed: 1
 ---
-Ovo je tekst koji mama uređuje u **Pages CMS-u** → *Stranice* → *O meni*.
+
 
 **Biserka Orešković**
 
@@ -20,7 +20,7 @@ potreban dogovor.
 
 ## Izložbe i sajmovi
 
- 
+
 
 ·       **3D Vinkuran fest**, Medulin 2017,
 
@@ -50,7 +50,7 @@ Rad:Vaza i devet ruža na bakrenim šipkama, Zagreb
 
  rad: Plodonosan trs (ostala samo fotografija)
 
- 
+
 
 •        **Međunarodna izložba suvremene keramike, „Izrazi se bojom“,** Rijeka,Hrvatska, Galerija zajednice Talijana Rijeke i Slovenska bistrica Galerija Grasslov stolp
 
